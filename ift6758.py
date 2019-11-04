@@ -2,6 +2,7 @@
 import getopt
 import sys
 from controller import controller
+import time
 
 
 def get_opt(opts):
@@ -12,9 +13,12 @@ def get_opt(opts):
 
 
 def main(argv):
+    start = time.time()
+    print(start)
     opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
     params = get_opt(opts)
     controller.generate_files(params['-i'], params['-o'])
+    print(time.time() - start)
 
 
 if __name__ == "__main__":

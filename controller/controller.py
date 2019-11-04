@@ -19,7 +19,7 @@ def generate_files(input_path, output_path):
 
     for i, (index, row) in enumerate(profiles.iterrows()):
         file = open(os.path.join(output_path, f'{row["userid"]}.xml'), 'w')
-        # gender = pr.get_gender(predicted['gender'][row[1]]) if row[1] in predicted['gender'] else 'null'
+        gender = pr.get_gender(predicted['gender'][row[1]]) if row[1] in predicted['gender'] else 'null'
         open_ = predicted['open'][row[1]] if row[1] in predicted['open'] else 'null'
         conscientious = predicted['conscientious'][row[1]] if row[1] in predicted['conscientious'] else 'null'
         extrovert = predicted['extrovert'][row[1]] if row[1] in predicted['extrovert'] else 'null'
@@ -29,8 +29,7 @@ def generate_files(input_path, output_path):
 
         file.write(f'<user id="{row[1]}" ')
         file.write(f'age_group="{age}" ')
-        # file.write(f'gender="{gender}" ')
-        file.write(f'gender="null" ')
+        file.write(f'gender="{gender}" ')
         file.write(f'extrovert="{extrovert}" ')
         file.write(f'neurotic="{neurotic}" ')
         file.write(f'agreeable="{agreeable}" ')

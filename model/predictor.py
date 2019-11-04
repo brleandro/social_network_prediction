@@ -38,7 +38,7 @@ class Predictor:
         pass
 
 
-class GenderPredictor:
+class GenderPredictor(Predictor):
     """Represents a predictor for one feature for Profile Model."""
 
     def __init__(self):
