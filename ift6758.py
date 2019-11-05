@@ -14,11 +14,11 @@ def get_opt(opts):
 
 def main(argv):
     start = time.time()
-    print(start)
+    print('Generating predictions.... Starting at', start)
     opts, args = getopt.getopt(argv, "hi:o:", ["ifile=", "ofile="])
     params = get_opt(opts)
     controller.generate_files(params['-i'], params['-o'])
-    print(time.time() - start)
+    print('Generated in', time.time() - start, 's')
 
 
 if __name__ == "__main__":

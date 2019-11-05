@@ -1,13 +1,10 @@
 """Predicts some feature"""
-import numpy as np
-from sklearn import dummy
-from sklearn.ensemble import RandomForestClassifier
 import pickle
 import numpy as np
 import pandas as pd
 import csv
 
-features = ['age_group', 'gender', 'open', 'conscientious', 'extrovert', 'agreeable', 'neurotic']
+features = ['age_group', 'gender', 'open', 'conscientious', 'extrovert', 'agreeable', 'neurotic', 'age_group_alternative']
 
 
 class Predictor:
@@ -194,10 +191,6 @@ class AgePredictor(Predictor):
             prob_1_like_id = []
             prob_2_like_id = []
             prob_3_like_id = []
-            prob_0 = 0
-            prob_1 = 0
-            prob_2 = 0
-            prob_3 = 0
 
             for index, row in relation.loc[relation['userid'] == user_id_val].iterrows():
                 like_id_val = row['like_id']
@@ -242,6 +235,71 @@ class AgePredictor(Predictor):
 
     def predicted_feature(self):
         return 'age_group'
+
+    def predictor_file_name(self):
+        pass
+
+
+class AgeGroupAlternativePredictor(Predictor):
+    """
+    Age predictor used for profiles that do not have image.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def predict(self, profiles, base_folder):
+        """
+        Predict using RandomForestClassifier
+        :param profiles:
+        :param base_folder:
+        :return:
+        """
+        relation = pd.read_csv(f'{base_folder}/Relation/Relation.csv')
+
+        with open('data/gender_0.csv') as csv_file:
+            reader = csv.reader(csv_file)
+            dict_gender_0 = dict(reader)
+
+        with open('data/gender_1.csv') as csv_file:
+            reader = csv.reader(csv_file)
+            dict_gender_1 = dict(reader)
+
+        list_gender = {}
+
+        for i in range(len(profiles)):
+            userid_val = profiles.iloc[i][1]
+
+            prob_0_like_id = []
+            prob_1_like_id = []
+
+            for index, row in relation.loc[relation['userid'] == userid_val].iterrows():
+                like_id_val = row['like_id']
+                sum_freq = (float(dict_gender_0.get(str(like_id_val), 0)) + float(
+                    dict_gender_1.get(str(like_id_val), 0)))
+                if sum_freq != 0:
+                    prob_0_like_id.append(np.max(float(dict_gender_0.get(str(like_id_val), 0)) / (sum_freq)))
+                    prob_1_like_id.append(np.max(float(dict_gender_1.get(str(like_id_val), 0)) / (sum_freq)))
+
+            if len(prob_0_like_id) != 0:
+                prob_0 = np.sum(prob_0_like_id) / len(prob_0_like_id)
+            else:
+                prob_0 = 0
+
+            if len(prob_1_like_id) != 0:
+                prob_1 = np.sum(prob_1_like_id) / len(prob_1_like_id)
+            else:
+                prob_1 = 1
+
+            if np.argmax([prob_0, prob_1]) == 0:
+                list_gender[userid_val] = 'male'
+            else:
+                list_gender[userid_val] = 'female'
+
+        return list_gender
+
+    def predicted_feature(self):
+        return 'age_group_alternative'
 
     def predictor_file_name(self):
         pass
